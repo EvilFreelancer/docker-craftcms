@@ -27,7 +27,7 @@ getTarballs | while read line; do
 
     if [ "x$(getTag "$tag")" == "x" ]
         then
-            sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$1\3/g" -i Dockerfile
+            sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
             git commit -m "Release of CraftCMS changes to $tag" -a
             git push
             git tag "$tag"
