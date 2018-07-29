@@ -5,7 +5,7 @@ cd "$(dirname $0)"
 
 function getTarballs
 {
-    curl "https://api.github.com/repos/craftcms/craft/tags" -o - 2>/dev/null \
+    curl "https://api.github.com/repos/craftcms/craft/tags?page=2" -o - 2>/dev/null \
         | grep 'tarball_url' \
         | awk -F \" '{print $4}' \
         | sort --version-sort
