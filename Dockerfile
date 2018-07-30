@@ -1,6 +1,6 @@
 FROM evilfreelancer/alpine-apache-php7:php-7.1
 
-ENV CRAFTCMS_TAG="3.0.16.1"
+ENV CRAFTCMS_TAG="3.0.17"
 ENV CRAFTCMS_TARGZ="https://api.github.com/repos/craftcms/craft/tarball"
 WORKDIR /app
 
