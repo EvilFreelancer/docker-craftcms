@@ -5,7 +5,7 @@ cd "$(dirname $0)"
 
 function getTarballs
 {
-    curl "https://api.github.com/repos/craftcms/craft/tags" -o - 2>/dev/null \
+    curl "https://api.github.com/repos/craftcms/cms/tags?page=2" -o - 2>/dev/null \
         | grep 'tarball_url' \
         | awk -F \" '{print $4}' \
         | sort --version-sort
@@ -27,11 +27,19 @@ getTarballs | while read line; do
 
     if [ "x$(getTag "$tag")" != "x" ]
         then
-            sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
-            git commit -m "Release of CraftCMS changes to $tag" -a
-            git push
-            git tag "$tag"
-            git push --tags
+
+            url=https://download.craftcdn.com/craft/3.0/Craft-$tag.tar.gz
+            if curl --output /dev/null --silent --head --fail "$url"; then
+                echo "URL exists: $url"
+                sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
+                git commit -m "Release of CraftCMS changes to $tag" -a
+                git push
+                git tag "$tag"
+                git push --tags
+            else
+                echo "URL does not exist: $url"
+            fi
+
         else
             echo ">>> Tag $tag has been already created"
     fi
