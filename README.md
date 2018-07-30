@@ -1,10 +1,10 @@
 # CraftCMS inside Docker container
 
 Extra small image with basic CraftCMS inside Docker container, based on
-Alpine Linux with latest PHP (which available on stable Alpine of
+Alpine Linux with latest PHP (which available from repository of stable Alpine of
 course).
 
-List of available tags [required tag](https://hub.docker.com/r/evilfreelancer/docker-craftcms/tags/).
+List of [available tags](https://hub.docker.com/r/evilfreelancer/docker-craftcms/tags/).
 
 ## How to use
 
@@ -14,7 +14,7 @@ If you want to use this image and you just need to add source code of
 yor application with dependencies, for this just create `Dockerfile`
 with following content inside:
 
-```docker
+```dockerfile
 FROM evilfreelancer/docker-craftcms
 
 ADD [".", "/app"]
@@ -31,6 +31,20 @@ For building you just need run:
 By default image [alpine-apache-php7](https://hub.docker.com/r/evilfreelancer/alpine-apache-php7/)
 has `80` port exposed (apache2 here), so you just need plug your local
 port with port of container together:
+
+    docker run -d -p 80:80 craftcms-local
+
+### Via command line
+
+You can pull requred (or latest) version of CraftCMS engine from Docker Hub:
+
+    docker pull evilfreelancer/docker-craftcms
+
+Or set the tag which you want:
+
+    docker pull evilfreelancer/docker-craftcms:3.0.17.1
+
+Then start the container:
 
     docker run -d -p 80:80 craftcms-local
 
