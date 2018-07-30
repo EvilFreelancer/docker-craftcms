@@ -1,3 +1,7 @@
+[![MicroBadger Size](https://img.shields.io/microbadger/image-size/evilfreelancer/docker-craftcms.svg)](https://hub.docker.com/r/evilfreelancer/docker-craftcms/)
+[![MicroBadger Layers](https://img.shields.io/microbadger/layers/evilfreelancer/docker-craftcms.svg)](https://hub.docker.com/r/evilfreelancer/docker-craftcms/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/evilfreelancer/docker-craftcms.svg)](https://hub.docker.com/r/evilfreelancer/docker-craftcms/)
+
 # CraftCMS inside Docker container
 
 Extra small image with basic CraftCMS inside Docker container, based on
