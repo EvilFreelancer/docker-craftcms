@@ -11,4 +11,5 @@ RUN curl -L -o craftcms.tar.gz https://download.craftcdn.com/craft/3.0/Craft-$CR
  && tar xfvz craftcms.tar.gz -C . \
  && rm craftcms.tar.gz \
  && chmod +x craft \
+ && chown -R apache:apache /app \
  && composer update
