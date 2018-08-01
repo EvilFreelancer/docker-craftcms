@@ -7,7 +7,8 @@ WORKDIR /app
 # Change documents root from "public" to "web"
 RUN sed "s#/app/public#/app/web#" -i /etc/apache2/httpd.conf
 
-RUN curl -L -o craftcms.tar.gz https://download.craftcdn.com/craft/3.0/Craft-$CRAFTCMS_TAG.tar.gz \
+RUN apk --update --no-cache add php7-fileinfo \
+ && curl -L -o craftcms.tar.gz https://download.craftcdn.com/craft/3.0/Craft-$CRAFTCMS_TAG.tar.gz \
  && tar xfvz craftcms.tar.gz -C . \
  && rm craftcms.tar.gz \
  && chmod +x craft \

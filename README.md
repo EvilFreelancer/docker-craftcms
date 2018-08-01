@@ -36,7 +36,7 @@ By default image [alpine-apache-php7](https://hub.docker.com/r/evilfreelancer/al
 has `80` port exposed (apache2 here), so you just need plug your local
 port with port of container together:
 
-    docker run -d -p 80:80 craftcms-local
+    docker run -e SECURITY_KEY=somekey -d -p 80:80 craftcms-local
 
 ### Via command line
 
@@ -46,11 +46,11 @@ You can pull requred (or latest) version of CraftCMS engine from Docker Hub:
 
 Or set the tag which you want:
 
-    docker pull evilfreelancer/docker-craftcms:3.0.17.1
+    docker pull evilfreelancer/docker-craftcms:3.0.18
 
 Then start the container:
 
-    docker run -d -p 80:80 craftcms-local
+    docker run -e SECURITY_KEY=somekey -d -p 80:80 docker-craftcms
 
 ### Via docker-compose
 
@@ -81,6 +81,7 @@ services:
     ports:
       - 80:80
     environment:
+      # Security key is very important
       - SECURITY_KEY=somekey
       - DB_DRIVER=mysql
       - DB_SERVER=mysql
