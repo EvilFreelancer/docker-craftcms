@@ -14,14 +14,17 @@ List of [available tags](https://hub.docker.com/r/evilfreelancer/docker-craftcms
 
 ### Via Dockerfile
 
-If you want to use this image and you just need to add source code of
-yor application with dependencies, for this just create `Dockerfile`
-with following content inside:
+If you want to use this image, but you want to add source code of
+yor application with dependencies, then you need create `Dockerfile`
+with content like below in root of your existing CraftCMS project:
 
 ```dockerfile
 FROM evilfreelancer/docker-craftcms
 
-ADD [".", "/app"]
+# You can add any folders or files to /app folder in container
+ADD ["composer.json". "templates/", "/app"]
+# For example in resources you have additional js, css, img etc. files
+ADD ["web/resources/", "/app/resources"]
 WORKDIR /app
 
 RUN composer update \
@@ -33,10 +36,16 @@ For building you just need run:
     docker build . --tag craftcms-local
 
 By default image [alpine-apache-php7](https://hub.docker.com/r/evilfreelancer/alpine-apache-php7/)
-has `80` port exposed (apache2 here), so you just need plug your local
+has `80` port exposed (apache2 here) by default, so you just need plug your local
 port with port of container together:
 
     docker run -e SECURITY_KEY=somekey -d -p 80:80 craftcms-local
+
+For example you want to mount some external folders `/opt/nfs/assets`
+with static files (images, documents, etc.) or logs to your container, 
+you need to use `-v` (that mean "volume") key:
+
+    docker run -v /opt/cache/storage:/app/storage -v /opt/nfs/assets:/app/web/assets -e SECURITY_KEY=somekey -d -p 80:80 craftcms-local
 
 ### Via command line
 
@@ -62,8 +71,10 @@ version: "2"
 
 services:
 
+  # You can use MySQL, MariaDB or PostgreSQL image
   mysql:
     image: mysql:5.7
+    restart: unless-stopped
     ports:
       - 3306:3306
     environment:
@@ -89,9 +100,18 @@ services:
       - DB_PASSWORD=craft_pass
       - DB_DATABASE=craft-production
     volumes:
-      - ./craft/storage:/app/storage
+      # Storage with system logs, cache etc.
+      - ./craft/storage/logs:/app/storage/logs
+      - ./craft/storage/runtime/cache/us:/app/storage/runtime/cache/us
+      # Temapltes of website for development stage
       - ./craft/templates:/app/templates
+      # Plugins installed to your project (but better use "docker build context" with custom Dockerfile, example above)
+      - ./craft/vendor:/app/vendor
+      # Static files, with images, js, css, etc.
+      - ./craft/web/cpresources:/app/web/cpresources
       - ./craft/web/assets:/app/web/assets
+      - ./craft/web/resources:/app/web/resources
+      # ... list of any other folders/files which you need
 ```
 
 Run this composition of containers:
@@ -104,12 +124,14 @@ tag of docker image the you just need:
     docker-composer pull
     docker-composer up -d
 
-And your of CraftCMS container will be recreated if new version of
-CraftCMS/Craft projects in repository.
+And your CraftCMS container will be recreated if new version of CraftCMS
+container pushed added in repository.
 
 ## Almost done
 
 Now you need just open this url http://localhost, and you'll see the CraftCMS magic.
+But do not worry if you see the error message, you need install the engine, for this
+you need open http://localhost/admin page and follow the instruction.
 
 ## Links
 
