@@ -15,7 +15,7 @@ List of [available tags](https://hub.docker.com/r/evilfreelancer/docker-craftcms
 ### Via Dockerfile
 
 If you want to use this image, but you want to add source code of
-yor application with dependencies, then you need create `Dockerfile`
+your application with dependencies, then you need create `Dockerfile`
 with content like below in root of your existing CraftCMS project:
 
 ```dockerfile
@@ -31,11 +31,11 @@ RUN composer update \
  && chown -R apache:apache /app
 ```
 
-For building you just need run:
+For building you need just run:
 
     docker build . --tag craftcms-local
 
-By default image [alpine-apache-php7](https://hub.docker.com/r/evilfreelancer/alpine-apache-php7/)
+The image [alpine-apache-php7](https://hub.docker.com/r/evilfreelancer/alpine-apache-php7/)
 has `80` port exposed (apache2 here) by default, so you just need plug your local
 port with port of container together:
 
