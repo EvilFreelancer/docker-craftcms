@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Cron fix
 cd "$(dirname $0)"
@@ -29,7 +29,16 @@ getTarballs | while read line; do
         then
 
             url=https://download.craftcdn.com/craft/3.0/Craft-$tag.tar.gz
+            url2=https://download.craftcdn.com/craft/3.1/Craft-$tag.tar.gz
+
             if curl --output /dev/null --silent --head --fail "$url"; then
+                echo ">>> URL exists: $url"
+                sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
+                git commit -m "Release of CraftCMS changes to $tag" -a
+                git push
+                git tag "$tag"
+                git push --tags
+            elif curl --output /dev/null --silent --head --fail "$url2"; then
                 echo ">>> URL exists: $url"
                 sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
                 git commit -m "Release of CraftCMS changes to $tag" -a
