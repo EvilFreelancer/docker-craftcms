@@ -21,27 +21,25 @@ function checkTag
     git rev-list "$1" 2>/dev/null
 }
 
+function getRelease
+{
+    echo "$1" | awk -F \. '{print $1"."$2}'
+}
+
 getTarballs | while read line; do
     tag=`getTag "$line"`
     echo ">>> $line >>> $tag"
 
     if [ "x$(checkTag "$tag")" == "x" ]
         then
-
-            url=https://download.craftcdn.com/craft/3.0/Craft-$tag.tar.gz
-            url2=https://download.craftcdn.com/craft/3.1/Craft-$tag.tar.gz
+            release=`getRelease $tag`
+            url=https://download.craftcdn.com/craft/$release/Craft-$tag.tar.gz
 
             if curl --output /dev/null --silent --head --fail "$url"; then
                 echo ">>> URL exists: $url"
                 sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
+                sed -r "s/(CRAFTCMS_RELEASE=\")(.*)(\")/\1$release\3/g" -i Dockerfile
                 git commit -m "Release of CraftCMS changes to $tag" -a
-                git push
-                git tag "$tag"
-                git push --tags
-            elif curl --output /dev/null --silent --head --fail "$url2"; then
-                echo ">>> URL exists: $url"
-                sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
-                git commit -m "Release of CraftCMS changed to $tag" -a
                 git push
                 git tag "$tag"
                 git push --tags

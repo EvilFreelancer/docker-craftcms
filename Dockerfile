@@ -1,6 +1,7 @@
 FROM evilfreelancer/alpine-apache-php7:php-7.2
 
-ENV CRAFTCMS_TAG="3.1.0-beta.4"
+ENV CRAFTCMS_TAG="3.1.0-beta.2"
+ENV CRAFTCMS_RELEASE="3.1"
 ENV CRAFTCMS_TARGZ="https://api.github.com/repos/craftcms/craft/tarball"
 WORKDIR /app
 
@@ -8,7 +9,7 @@ WORKDIR /app
 RUN sed "s#/app/public#/app/web#" -i /etc/apache2/httpd.conf
 
 RUN apk --update --no-cache add php7-fileinfo php7-imagick php7-mcrypt php7-intl \
- && curl -L -o craftcms.tar.gz https://download.craftcdn.com/craft/3.0/Craft-$CRAFTCMS_TAG.tar.gz \
+ && curl -L -o craftcms.tar.gz https://download.craftcdn.com/craft/$CRAFTCMS_RELEASE/Craft-$CRAFTCMS_TAG.tar.gz \
  && tar xfvz craftcms.tar.gz -C . \
  && rm craftcms.tar.gz \
  && chmod +x craft \
