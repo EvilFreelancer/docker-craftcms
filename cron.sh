@@ -41,7 +41,7 @@ getTarballs | while read line; do
             elif curl --output /dev/null --silent --head --fail "$url2"; then
                 echo ">>> URL exists: $url"
                 sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
-                git commit -m "Release of CraftCMS changes to $tag" -a
+                git commit -m "Release of CraftCMS changed to $tag" -a
                 git push
                 git tag "$tag"
                 git push --tags
