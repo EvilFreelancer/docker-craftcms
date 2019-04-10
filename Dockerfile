@@ -14,8 +14,8 @@ RUN sed "s#/app/public#/app/web#" -i /etc/apache2/httpd.conf
 RUN rm -Rv public
 
 RUN git clone https://github.com/craftcms/craft.git ./ \
- && chmod 755 craft \
- && chown -R apache:apache /app \
  && sed "s#\"craftcms/cms\": \".*\",#\"craftcms/cms\": \"$CRAFTCMS_TAG\",#" -i composer.json \
  && cat composer.json \
- && composer install --no-dev
+ && composer install --no-dev \
+ && chmod 755 /app/craft \
+ && chown -R apache:apache /app
