@@ -6,8 +6,9 @@ cd "$(dirname $0)"
 function getTarballs
 {
     curl "https://api.github.com/repos/craftcms/cms/tags" -o - 2>/dev/null \
-        | grep 'tarball_url' \
+        | grep '"name":' \
         | awk -F \" '{print $4}' \
+        | grep -v hotdocs \
         | sort --version-sort
 }
 
@@ -21,31 +22,64 @@ function checkTag
     git rev-list "$1" 2>/dev/null
 }
 
-function getRelease
+function getMajor
+{
+    echo "$1" | awk -F \. '{print $1}'
+}
+
+function getMajorMinor
 {
     echo "$1" | awk -F \. '{print $1"."$2}'
 }
 
-getTarballs | while read line; do
-    tag=`getTag "$line"`
-    echo ">>> $line >>> $tag"
+function isStable
+{
+    if [[ $1 == *"-alpha"* ]]; then
+        return 1
+    fi
+
+    if [[ $1 == *"-beta"* ]]; then
+        return 1
+    fi
+
+    if [[ $1 == *"-rc"* ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
+getTarballs | while read tag; do
+    major=`getMajor $tag`
+    major_minor=`getMajorMinor $tag`
+
+    echo ">>> $major / $major_minor / $tag"
 
     if [ "x$(checkTag "$tag")" == "x" ]
         then
-            release=`getRelease $tag`
-            url=https://download.craftcdn.com/craft/$release/Craft-$tag.tar.gz
 
-            if curl --output /dev/null --silent --head --fail "$url"; then
-                echo ">>> URL exists: $url"
-                sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
-                sed -r "s/(CRAFTCMS_RELEASE=\")(.*)(\")/\1$release\3/g" -i Dockerfile
-                git commit -m "Release of CraftCMS changes to $tag" -a
-                git push
-                git tag "$tag"
-                git push --tags
-            else
-                echo ">>> URL don't exist: $url"
+            echo ">>> Possible is $major / $major_minor / $tag tags"
+
+            sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
+            git commit -m "Release of CraftCMS changes to $tag" -a
+            git push
+            git tag "$tag"
+
+            if isStable "$tag"; then
+                # Major with minor release tag
+                echo ">>> Create $major_minor tag of stable release"
+                git push origin :refs/tags/"$major_minor"
+                git tag -fa "$major_minor"
+
+                # Only major release tag
+                echo ">>> Create $major tag of stable release"
+                git push origin :refs/tags/"$major"
+                git tag -fa "$major"
             fi
+
+            git push --tags
+
+exit
 
         else
             echo ">>> Tag $tag has been already created"
