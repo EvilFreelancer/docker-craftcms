@@ -12,6 +12,15 @@ function getTarballs
         | sort --version-sort
 }
 
+function getTarballsOwn
+{
+    curl "https://api.github.com/repos/EvilFreelancer/docker-craftcms/tags" -o - 2>/dev/null \
+        | grep '"name":' \
+        | awk -F \" '{print $4}' \
+        | grep -v hotdocs \
+        | sort --version-sort
+}
+
 function getTag
 {
     echo "$1" | awk -F 'tarball/' '{print $2}'
@@ -51,7 +60,7 @@ function isStable
 
 function getLatestStable()
 {
-    getTarballs | while read tag; do
+    getTarballsOwn | while read tag; do
         if isStable "$tag"; then
             echo "$tag"
         fi
@@ -64,7 +73,6 @@ function versionGT
 }
 
 latest=`getLatestStable`
-current=3.1.23
 
 getTarballs | while read tag; do
     major=`getMajor $tag`
@@ -89,10 +97,10 @@ getTarballs | while read tag; do
                 git tag -f "$major_minor"
 
                 # Only major release tag
-                if versionGT $current $latest; then
-                    echo "> $latest is less than $current, neet to fix major tag"
+                if versionGT $tag $latest; then
+                    echo "> $latest is less than $tag, need to fix major tag"
                     echo "> Create $major tag of stable release"
-                    git push origin :refs/tags/"$major_minor"
+                    git push origin :refs/tags/"$major"
                     git tag -f "$major_minor"
                 fi
             fi
