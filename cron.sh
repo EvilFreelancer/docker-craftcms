@@ -49,6 +49,23 @@ function isStable
     return 0
 }
 
+function getLatestStable()
+{
+    getTarballs | while read tag; do
+        if isStable "$tag"; then
+            echo "$tag"
+        fi
+    done | tail -n 1
+}
+
+function versionGT
+{
+    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
+}
+
+latest=`getLatestStable`
+current=3.1.23
+
 getTarballs | while read tag; do
     major=`getMajor $tag`
     major_minor=`getMajorMinor $tag`
@@ -58,7 +75,7 @@ getTarballs | while read tag; do
     if [ "x$(checkTag "$tag")" == "x" ]
         then
 
-            echo ">>> Possible is $major / $major_minor / $tag tags"
+            echo "> Possible is $major / $major_minor / $tag tags"
 
             sed -r "s/(CRAFTCMS_TAG=\")(.*)(\")/\1$tag\3/g" -i Dockerfile
             git commit -m "Release of CraftCMS changes to $tag" -a
@@ -67,14 +84,17 @@ getTarballs | while read tag; do
 
             if isStable "$tag"; then
                 # Major with minor release tag
-                echo ">>> Create $major_minor tag of stable release"
+                echo "> Create $major_minor tag of stable release"
                 git push origin :refs/tags/"$major_minor"
-                git tag -fa "$major_minor"
+                git tag -f "$major_minor"
 
                 # Only major release tag
-                echo ">>> Create $major tag of stable release"
-                git push origin :refs/tags/"$major"
-                git tag -fa "$major"
+                if versionGT $current $latest; then
+                    echo "> $latest is less than $current, neet to fix major tag"
+                    echo "> Create $major tag of stable release"
+                    git push origin :refs/tags/"$major_minor"
+                    git tag -f "$major_minor"
+                fi
             fi
 
             git push --tags
