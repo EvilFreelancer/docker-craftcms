@@ -33,33 +33,65 @@ RUN composer update \
 
 For building you need just run:
 
-    docker build . --tag craftcms-local
+```bash
+docker build . --tag craftcms-local
+```
 
 The image [alpine-apache-php7](https://hub.docker.com/r/evilfreelancer/alpine-apache-php7/)
 has `80` port exposed (apache2 here) by default, so you just need plug your local
 port with port of container together:
 
-    docker run -e SECURITY_KEY=somekey -d -p 80:80 craftcms-local
+```bash
+docker run -e SECURITY_KEY=somekey -d -p 80:80 craftcms-local
+```
 
 For example you want to mount some external folders `/opt/nfs/assets`
 with static files (images, documents, etc.) or logs to your container, 
 you need to use `-v` (that mean "volume") key:
 
-    docker run -v /opt/cache/storage:/app/storage -v /opt/nfs/assets:/app/web/assets -e SECURITY_KEY=somekey -d -p 80:80 craftcms-local
+```bash
+docker run \
+    -v ./craft/storage:/app/storage \
+    -v ./craft/vendor:/app/vendor \
+    -v ./craft/web/cpresources:/app/web/cpresources \
+    -v /opt/nfs/assets:/app/web/assets \
+    -e SECURITY_KEY=somekey \
+    -p 80:80 \
+    -d craftcms-local
+```
 
 ### Via command line
 
-You can pull requred (or latest) version of CraftCMS engine from Docker Hub:
+You can pull latest (same as with :latest) version of CraftCMS engine from Docker Hub
+(will be downloaded latest stable version, eg 3.9.99):
 
-    docker pull evilfreelancer/docker-craftcms
+```bash
+docker pull evilfreelancer/docker-craftcms
+```
 
-Or set the tag which you want:
+Or set the tag which you need:
 
-    docker pull evilfreelancer/docker-craftcms:3.0.18
+```bash
+docker pull evilfreelancer/docker-craftcms:3.1.18
+```
+
+Or minor stable version (will be downloaded latest stable version in 3.1 release, eg. 3.1.99):
+
+```bash
+docker pull evilfreelancer/docker-craftcms:3.1
+```
+
+Or major stable version (will be downloaded latest stable version, eg. 3.9.99):
+
+```bash
+docker pull evilfreelancer/docker-craftcms:3
+```
 
 Then start the container:
 
-    docker run -e SECURITY_KEY=somekey -d -p 80:80 docker-craftcms
+```bash
+docker run -e SECURITY_KEY=somekey -d -p 80:80 docker-craftcms
+```
 
 ### Via docker-compose
 
@@ -87,7 +119,7 @@ services:
       - ./logs/mysql:/var/log/mysql
 
   craftcms:
-    image: evilfreelancer/docker-craftcms:latest
+    image: evilfreelancer/docker-craftcms:3
     restart: unless-stopped
     ports:
       - 80:80
@@ -116,22 +148,45 @@ services:
 
 Run this composition of containers:
 
-    docker-compuse up -d
+```bash
+docker-compose up -d
+```
+
+Now need fix permissions to importnat folders, it should be `apache:apache`.
+
+```bash
+# Login to craftcms container
+docker-compose exec craftcms bash
+
+# Fix permissions from inside of container
+chown apache:apache .env
+chown apache:apache composer.json
+chown apache:apache composer.lock
+chown apache:apache config/license.key
+chown apache:apache -R storage
+chown apache:apache -R vendor
+chown apache:apache -R web/cpresources
+```
+
+If you mounted `storage`, `vendor`, `web/cpresources` from real drive
+then changes will be saved.  
 
 But how to update the CraftCMS image? That's easy, if you use `:latest`
-tag of docker image the you just need:
+tag of docker image then you just need:
 
-    docker-composer pull
-    docker-composer up -d
+```bash
+docker-compose pull
+docker-compose up -d
+```
 
 And your CraftCMS container will be recreated if new version of CraftCMS
 container pushed added in repository.
 
 ## Almost done
 
-Now you need just open this url http://localhost, and you'll see the CraftCMS magic.
+Now you need just open this url http://localhost and you'll see the CraftCMS magic.
 But do not worry if you see the error message, you need install the engine, for this
-you need open http://localhost/admin page and follow the instruction.
+you need open http://localhost/index.php?p=admin/install page and follow the instruction.
 
 ## Links
 
