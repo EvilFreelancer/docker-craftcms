@@ -91,13 +91,13 @@ getTarballs | while read tag; do
             git tag "$tag"
 
             if isStable "$tag"; then
+                # Major with minor release tag
+                echo "> Create $major_minor tag of stable release"
+                git push origin :refs/tags/"$major_minor"
+                git tag -f "$major_minor"
+
                 if versionGT $tag $latest; then
                     echo "> $latest is less than $tag, need to fix major tag"
-
-                    # Major with minor release tag
-                    echo "> Create $major_minor tag of stable release"
-                    git push origin :refs/tags/"$major_minor"
-                    git tag -f "$major_minor"
 
                     # Only major release tag
                     echo "> Create $major tag of stable release"
