@@ -1,6 +1,6 @@
 FROM evilfreelancer/alpine-apache-php7:latest
 
-ENV CRAFTCMS_TAG="3.1.30"
+ENV CRAFTCMS_TAG="3.2.0-beta.2"
 ENV CRAFTCMS_TARGZ="https://codeload.github.com/craftcms/cms/tar.gz"
 WORKDIR /app
 
