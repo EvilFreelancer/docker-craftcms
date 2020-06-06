@@ -126,11 +126,14 @@ services:
     environment:
       # Security key is very important
       - SECURITY_KEY=somekey
-      - DB_DRIVER=mysql
-      - DB_SERVER=mysql
+      - DB_DSN=mysql:host=mysql;port=3306;dbname=craft-production
       - DB_USER=craft
       - DB_PASSWORD=craft_pass
-      - DB_DATABASE=craft-production
+      # - DB_DSN: pgsql:host=postgres;port=5432;dbname=craft-production
+      # - DB_USER: postgres
+      # - DB_PASSWORD: ''
+      # - DB_SCHEMA: public
+      # - DB_TABLE_PREFIX: ''
     volumes:
       # Storage with system logs, cache etc.
       - ./craft/storage/logs:/app/storage/logs
